@@ -350,39 +350,38 @@ abstract class Grammar extends BaseGrammar {
 		)->getColumn($fluent['name']);
 	}
 
-    /**
-     * Get the Doctrine column change options.
-     *
-     * @param  \Illuminate\Support\Fluent  $fluent
-     * @return array
-     */
-    protected function getDoctrineColumnChangeOptions(Fluent $fluent)
-    {
+	/**
+	 * Get the Doctrine column change options.
+	 *
+	 * @param  \Illuminate\Support\Fluent  $fluent
+	 * @return array
+	 */
+	protected function getDoctrineColumnChangeOptions(Fluent $fluent)
+	{
+		$options = ['type' => Type::getType($this->getDoctrineColumnBaseType($this->getType($fluent)))];
 
-        $options = ['type' => Type::getType($this->getDoctrineColumnBaseType($this->getType($fluent)))];
+		if (in_array($fluent['type'], ['text', 'mediumText', 'longText']))
+		{
+			$options['length'] = $this->calculateDoctrineTextLength($fluent['type']);
+		}
 
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText']))
-        {
-            $options['length'] = $this->calculateDoctrineTextLength($fluent['type']);
-        }
+		return $options;
+	}
 
-        return $options;
-    }
-
-    /**
-     * Strip column type parentheses
-     *
-     * @param $type
-     * @return string
-     */
-    protected function getDoctrineColumnBaseType($type)
-    {
-        if ($parenPos = strpos($type, '('))
-        {
-            $type = substr($type, 0, $parenPos);
-        }
-        return $type;
-    }
+	/**
+	 * Strip column type parentheses
+	 *
+	 * @param string $type
+	 * @return string
+	 */
+	protected function getDoctrineColumnBaseType($type)
+	{
+		if ($parenPos = strpos($type, '('))
+		{
+			$type = substr($type, 0, $parenPos);
+		}
+		return $type;
+	}
 
 	/**
 	 * Calculate the proper column length to force the Doctrine text type.
